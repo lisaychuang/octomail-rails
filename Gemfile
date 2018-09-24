@@ -29,6 +29,11 @@ gem 'omniauth'
 gem 'omniauth-github'
 gem 'unicorn'
 gem 'unicorn-rails'
+gem 'pry'
+gem "octokit", "~> 4.0"
+
+# Encrypt token
+gem "attr_encrypted", "~> 3.0.0"
 group :development do
   gem 'better_errors'
   gem 'rails_layout'

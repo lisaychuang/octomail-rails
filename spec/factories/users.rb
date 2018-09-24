@@ -1,7 +1,5 @@
 FactoryBot.define do
   factory :user do
-    name { "MyString" }
-    provider { "MyString" }
-    uid { "MyString" }
+    name "Test User"
   end
 end

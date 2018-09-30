@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
-ruby '2.5.1'
+ruby '2.4.0'
 gem 'rails', '~> 5.2.1'
 gem 'dotenv-rails', groups: [:development, :test]
 gem 'puma', '~> 3.11'
@@ -15,10 +15,10 @@ end
 group :development do
   gem 'web-console', '>= 3.3.0'
   gem 'listen', '>= 3.0.5', '< 3.2'
-  gem 'spring'
+  gem 'spring', '~> 1.7.2'
   gem 'spring-watcher-listen', '~> 2.0.0'
 end
-group :test do
+ group :test do
   gem 'capybara', '>= 2.15'
   gem 'selenium-webdriver'
   gem 'chromedriver-helper'
@@ -32,8 +32,6 @@ gem 'unicorn-rails'
 gem 'pry'
 gem "octokit", "~> 4.0"
 
-# Encrypt token
-gem "attr_encrypted", "~> 3.0.0"
 group :development do
   gem 'better_errors'
   gem 'rails_layout'

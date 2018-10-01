@@ -32,9 +32,9 @@ module RailsOctomail
       # react frontend
       allow do
         origins "localhost:4000", # local
-          "gitmailz.herokuapp.com", # heroku default
+          "https://gitmailz.herokuapp.com", # heroku default
           # "*.gitmailz.com", # any subdomain
-          "gitmailz.com" # apex (top level) domain
+          "https://gitmailz.com" # apex (top level) domain
         resource "*",
                  headers: :any,
                  credentials: true,

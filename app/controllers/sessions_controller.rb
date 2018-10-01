@@ -14,7 +14,7 @@ class SessionsController < ApplicationController
                       :uid => auth['uid'].to_s).first
 
     # If the user exists, update it with any useful info we got from github
-    existing_user.update_omniauth_info(auth) if defined?(existing_user)
+    existing_user.update_omniauth_info(auth) if existing_user
     
     # If existing_user is not defined (i.e., first login), create a new user from github info
     user = existing_user || User.create_with_omniauth(auth)

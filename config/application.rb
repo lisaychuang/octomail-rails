@@ -31,7 +31,7 @@ module RailsOctomail
     config.middleware.insert_before 0, Rack::Cors do
       # react frontend
       allow do
-        origins "/\Ahttp:\/\/localhost(:\d+)?\z/", # local
+        origins "localhost:4000", # local
           "gitmailz.herokuapp.com", # heroku default
           # "*.gitmailz.com", # any subdomain
           "gitmailz.com" # apex (top level) domain

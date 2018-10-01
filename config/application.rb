@@ -1,6 +1,6 @@
-require_relative 'boot'
+require_relative "boot"
 
-require 'rails/all'
+require "rails/all"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -8,7 +8,6 @@ Bundler.require(*Rails.groups)
 
 module RailsOctomail
   class Application < Rails::Application
-
     config.generators do |g|
       g.test_framework :rspec,
         fixtures: true,
@@ -32,14 +31,19 @@ module RailsOctomail
     config.middleware.insert_before 0, Rack::Cors do
       # react frontend
       allow do
-        origins 'https://gitmailz.herokuapp.com/'
-        resource '*', headers: :any, methods: [:get, :post, :put, :delete]
-      end
-
-      # rails backend 
-      allow do
-        origins 'https://gitmailz-api.herokuapp.com'
-        resource '*', headers: :any, methods: [:get, :post, :put, :delete, :options]
+        origins "/\Ahttp:\/\/localhost(:\d+)?\z/", # local
+          "gitmailz.herokuapp.com", # heroku default
+          # "*.gitmailz.com", # any subdomain
+          "gitmailz.com" # apex (top level) domain
+        resource "*",
+                 headers: :any,
+                 credentials: true,
+                 methods: [
+                   :get #,
+                 # :post,
+                 # :put, # enable this when you need to make an UPDATE api call, from your react app
+                 # :delete
+                 ]
       end
     end
   end

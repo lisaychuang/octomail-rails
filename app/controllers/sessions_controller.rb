@@ -8,8 +8,17 @@ class SessionsController < ApplicationController
 
   def create
     auth = request.env["omniauth.auth"]
-    user = User.where(:provider => auth['provider'],
-                      :uid => auth['uid'].to_s).first || User.create_with_omniauth(auth)
+
+    # Attempt to get a user from the DB, with a uid matching what we got from github
+    existing_user = User.where(:provider => auth['provider'],
+                      :uid => auth['uid'].to_s).first
+
+    # If the user exists, update it with any useful info we got from github
+    existing_user.update_omniauth_info(auth) if defined?(existing_user)
+    
+    # If existing_user is not defined (i.e., first login), create a new user from github info
+    user = existing_user || User.create_with_omniauth(auth)
+
     reset_session
     session[:user_id] = user.id
     redirect_to root_url, :notice => 'Signed in!'

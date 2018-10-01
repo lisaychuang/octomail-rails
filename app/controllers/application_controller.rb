@@ -45,8 +45,13 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate_user!
+
+    puts current_user
     if !current_user
+      puts ">>> NO CURRENT USER"
       redirect_to root_url, :alert => "You need to sign in for access to this page."
+    else 
+      puts ">>> FOUND CURRENT USER"
     end
   end
 

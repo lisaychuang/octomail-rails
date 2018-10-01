@@ -28,13 +28,19 @@ module RailsOctomail
     # -- all .rb files in that directory are automatically loaded after loading
     # the framework and any gems in your application.
 
-    # Initialize configuration for rack-cors 
+    # Initialize configuration for rack-cors
     config.middleware.insert_before 0, Rack::Cors do
+      # react frontend
       allow do
         origins 'https://gitmailz.herokuapp.com/'
         resource '*', headers: :any, methods: [:get, :post, :put, :delete]
       end
-    end
 
+      # rails backend 
+      allow do
+        origins 'https://gitmailz-api.herokuapp.com'
+        resource '*', headers: :any, methods: [:get, :post, :put, :delete, :options]
+      end
+    end
   end
 end

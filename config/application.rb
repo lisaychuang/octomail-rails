@@ -28,4 +28,11 @@ module RailsOctomail
     # -- all .rb files in that directory are automatically loaded after loading
     # the framework and any gems in your application.
   end
+
+  config.middleware.insert_before 0, Rack::Cors do
+    allow do
+      origins 'https://gitmailz.herokuapp.com/'
+      resource '*', headers: :any, methods: [:get, :post, :put, :delete]
+    end
+  end
 end

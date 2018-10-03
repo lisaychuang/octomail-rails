@@ -1,9 +1,8 @@
-require 'pry'
+require "pry"
 
 class SessionsController < ApplicationController
-
   def new
-    redirect_to '/auth/github'
+    redirect_to "/auth/github"
   end
 
   def create
@@ -14,8 +13,10 @@ class SessionsController < ApplicationController
                       :uid => auth['uid'].to_s).first
 
     # If the user exists, update it with any useful info we got from github
-    if existing_user 
+    if existing_user
       existing_user.update_omniauth_info(auth)
+    else
+      redirect_to '/auth/failure'
     end
 
     # If existing_user is not defined (i.e., first login), create a new user from github info
@@ -23,16 +24,19 @@ class SessionsController < ApplicationController
 
     reset_session
     session[:user_id] = user.id
-    redirect_to "https://gitmailz.herokuapp.com/account", :notice => 'Signed in!'
+    flash[:notice] = "You have signed in!"
+    redirect_to "https://gitmailz.herokuapp.com/account"
   end
 
   def destroy
     reset_session
-    redirect_to root_url, :notice => 'Signed out!'
+    flash[:notice] = "You have signed out!"
+    redirect_to root_url
   end
 
   def failure
-    redirect_to root_url, :alert => "Authentication error: #{params[:message].humanize}"
+    puts ">>>> FAILURE <<<<"
+    flash[:error] = "Authentication error, please try to login again"
+    redirect_to root_url
   end
-
 end

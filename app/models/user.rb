@@ -3,6 +3,9 @@ class User < ApplicationRecord
   validates :uid, uniqueness: true
   # attr_encrypted :token, key: ENV["GH_TOKEN_KEY"]
 
+  has_many :repos, through: :notifications
+  has_many :notifications
+
   def token
     # decrypting github_token using MessageEncryptor
     key = ENV["GH_TOKEN_KEY"]

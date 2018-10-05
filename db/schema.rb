@@ -10,20 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_10_04_224946) do
-
-  create_table "reasons", force: :cascade do |t|
-    t.string "name"
-    t.string "description"
-    t.integer "order"
-  end
-
-  create_table "repos", force: :cascade do |t|
-    t.integer "gid"
-    t.string "name"
-    t.string "full_name"
-    t.string "repo_url"
-  end
+ActiveRecord::Schema.define(version: 2018_09_24_013253) do
 
   create_table "users", force: :cascade do |t|
     t.string "name"

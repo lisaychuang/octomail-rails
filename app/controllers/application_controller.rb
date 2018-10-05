@@ -13,14 +13,36 @@ class ApplicationController < ActionController::Base
   def notifications
     @current_user ||= User.find(session[:user_id]) if session[:user_id]
     @client = Octokit::Client.new(:access_token => @current_user.token)
-    @json = @client.notifications
+
+    # get first 50 notifications (github paginates at 50)
+    notifications = @client.notifications({all: true, per_page: 50})
+
+    # if there are more pages, get page 2
+    more_pages = @client.last_response.rels[:next]
+    if more_pages
+      notifications.concat more_pages.get.data
+    end
+
+    # Consider how to get more pages...
+    # page_count = 0
+    # while more_pages and page_count < 10
+    #   notifications.concat more_pages.get.data
+    #   page_count++
+    #   more_pages = @client.last_response.rels[:next]
+    # end
+
+    # iterate over notifications to:
+    # add score value
+    # add notification_url value
+    @json = notifications.map do |notification|
+      add_score_url_to_notification(notification)
+    end
 
     respond_to do |format|
       format.json {
-        render json: @json.map{ |item| item.to_hash }.to_json , status: 200
+        render json: @json.to_json, status: 200
       }
     end
-
   end
 
   private
@@ -45,14 +67,14 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate_user!
-
     puts current_user
     if !current_user
       puts ">>> NO CURRENT USER"
       redirect_to root_url, :alert => "You need to sign in for access to this page."
-    else 
+    else
       puts ">>> FOUND CURRENT USER"
     end
   end
 
+  
 end

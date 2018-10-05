@@ -76,5 +76,40 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  #Add score attribute & value to each notification based on its "reason"
+  #    notification_url attribute & value to each notification based on its "subject.type"
+  def add_score_url_to_notification(notification)
+    nhash = notification.to_hash
+    nhash[:score] = score_from_reason(notification[:reason])
+    nhash[:notification_url] = transform_api_url(notification[:subject][:type], notification[:subject][:url], notification[:subject][:title], notification[:repository][:html_url])
+    nhash
+  end
+
+  # define score for each type of "reason"
+  def score_from_reason(reason)
+    case reason
+    when "invitation"
+      1
+    when "mention"
+      2
+    when "assign"
+      3
+    when "team_mention"
+      4
+    when "manual"
+      5
+    when "author"
+      6
+    when "state_change"
+      7
+    when "comment"
+      8
+    when "subscribed"
+      9
+    else
+      0
+    end
+  end
+
   
 end

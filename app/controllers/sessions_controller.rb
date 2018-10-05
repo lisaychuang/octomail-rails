@@ -1,6 +1,7 @@
 require "pry"
 
 class SessionsController < ApplicationController
+  @@ui_host = Rails.env === "development" ? "http://localhost:4000" : "https://gitmailz.herokuapp.com"
   def new
     redirect_to "/auth/github"
   end
@@ -26,8 +27,9 @@ class SessionsController < ApplicationController
     # Redirect to account info page
     if user 
       session[:user_id] = user.id
+      puts "User signed in: #{user.id}"
       flash[:notice] = "You are signed in!"
-      redirect_to "https://gitmailz.herokuapp.com/account"
+      redirect_to "#{@@ui_host}/account"
 
     # If not, redirect to failure page and ask user to login again
     else

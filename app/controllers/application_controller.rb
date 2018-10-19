@@ -4,7 +4,7 @@ require "pry"
 class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
-  protect_from_forgery with: :exception, except: :findRepos
+  protect_from_forgery with: :exception, only: []
   helper_method :current_user
   helper_method :user_signed_in?
   helper_method :correct_user?
@@ -44,25 +44,37 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # Return user's favorite repos in a string
+  def fav_repos
+    @current_user ||= User.find(session[:user_id]) if session[:user_id]
+    @json = @current_user.UserPreference[:search_input]
+
+    respond_to do |format|
+      format.json {
+        render json: @json.to_json, status: 200
+      }
+    end
+  end
+
   # Find exact repo link
-  def findRepos
+  def find_repos
     @current_user ||= User.find(session[:user_id]) if session[:user_id]
     @client = Octokit::Client.new(:access_token => @current_user.token)
 
     # get user input from API
     user_input_string = request.params[:_json]
-    input_arr = user_input_string.gsub(/\s+/, "").split(',')
+    input_arr = user_input_string.gsub(/\s+/, "").split(",")
 
-    # search repos using user input 
+    # search repos using user input
     repoids = input_arr.map do |input|
       repo = @client.repository(input)
       "#{repo.to_hash[:id]}"
     end
 
     @current_user.UserPreference.search_input = user_input_string
-    @current_user.UserPreference.repos = repoids.join(',')
+    @current_user.UserPreference.repos = repoids.join(",")
     @current_user.UserPreference.save
-    binding.pry
+
     respond_to do |format|
       format.json {
         render json: repoids.to_json, status: 200
@@ -71,7 +83,7 @@ class ApplicationController < ActionController::Base
   end
 
   # Search term returns a list of 50 repos
-  def searchRepo
+  def search_repos
     @current_user ||= User.find(session[:user_id]) if session[:user_id]
     @client = Octokit::Client.new(:access_token => @current_user.token)
 
@@ -127,7 +139,7 @@ class ApplicationController < ActionController::Base
     isFave = options[:favRepos].include?(notification.repository.id.to_s)
     nhash = notification.to_hash
 
-    if isFave then
+    if isFave
       nhash[:score] = score_from_reason(notification[:reason]) + 100
     else
       nhash[:score] = score_from_reason(notification[:reason])

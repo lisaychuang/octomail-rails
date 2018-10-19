@@ -39,8 +39,8 @@ module RailsOctomail
                  headers: :any,
                  credentials: true,
                  methods: [
-                   :get #,
-                 # :post,
+                   :get ,
+                 :post#,
                  # :put, # enable this when you need to make an UPDATE api call, from your react app
                  # :delete
                  ]

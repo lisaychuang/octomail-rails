@@ -4,8 +4,7 @@ require "pry"
 class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
-  protect_from_forgery with: :exception
-
+  protect_from_forgery with: :exception, except: :findRepos
   helper_method :current_user
   helper_method :user_signed_in?
   helper_method :correct_user?
@@ -36,6 +35,50 @@ class ApplicationController < ActionController::Base
     # add notification_url value
     @json = notifications.map do |notification|
       add_score_url_to_notification(notification)
+    end
+
+    respond_to do |format|
+      format.json {
+        render json: @json.to_json, status: 200
+      }
+    end
+  end
+
+  # Find exact repo link
+  def findRepos
+    @current_user ||= User.find(session[:user_id]) if session[:user_id]
+    @client = Octokit::Client.new(:access_token => @current_user.token)
+
+    results = []
+    # get user input from API
+    user_input_string = request.params[:_json]
+    input_arr = user_input_string.gsub(/\s+/, "").split(',')
+
+    # search repos using user input 
+    input_arr.map do |input|
+      repo = @client.repository(input)
+      @json = repo.to_hash
+      results << @json
+    end
+
+    respond_to do |format|
+      format.json {
+        render json: results.to_json, status: 200
+      }
+    end
+  end
+
+  # Search term returns a list of 50 repos
+  def searchRepo
+    @current_user ||= User.find(session[:user_id]) if session[:user_id]
+    @client = Octokit::Client.new(:access_token => @current_user.token)
+
+    # search repos using user query
+    repos = @client.search_repositories("ember")
+
+    @json = repos.items.map do |repo|
+      nhash = repo.to_hash
+      nhash
     end
 
     respond_to do |format|
@@ -115,17 +158,17 @@ class ApplicationController < ActionController::Base
 
   def transform_api_url(subject_type, api_url, title, html_url)
     case subject_type
-      when "PullRequest"
-        pull_request_url(api_url)
-      when "Release"
-        release_url(api_url, title)
-      when "Issue"
-        issue_url(api_url)
-      when "RepositoryInvitation"
-        invite_url(html_url)
-      else
-        "https://github.com/notifications"
-      end
+    when "PullRequest"
+      pull_request_url(api_url)
+    when "Release"
+      release_url(api_url, title)
+    when "Issue"
+      issue_url(api_url)
+    when "RepositoryInvitation"
+      invite_url(html_url)
+    else
+      "https://github.com/notifications"
+    end
   end
 
   # Notification type: PULL REQUEST

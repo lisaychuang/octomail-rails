@@ -34,7 +34,7 @@ class ApplicationController < ActionController::Base
     # add score value
     # add notification_url value
     @json = notifications.map do |notification|
-      add_score_url_to_notification(notification)
+      add_score_url_to_notification(notification, {})
     end
 
     respond_to do |format|
@@ -49,21 +49,23 @@ class ApplicationController < ActionController::Base
     @current_user ||= User.find(session[:user_id]) if session[:user_id]
     @client = Octokit::Client.new(:access_token => @current_user.token)
 
-    results = []
     # get user input from API
     user_input_string = request.params[:_json]
     input_arr = user_input_string.gsub(/\s+/, "").split(',')
 
     # search repos using user input 
-    input_arr.map do |input|
+    repoids = input_arr.map do |input|
       repo = @client.repository(input)
-      @json = repo.to_hash
-      results << @json
+      "#{repo.to_hash[:id]}"
     end
+
+    @current_user.UserPreference.search_input = user_input_string
+    @current_user.UserPreference.repos = repoids.join(',')
+    @current_user.UserPreference.save
 
     respond_to do |format|
       format.json {
-        render json: results.to_json, status: 200
+        render json: repoids.to_json, status: 200
       }
     end
   end

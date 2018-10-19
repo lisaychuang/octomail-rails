@@ -34,7 +34,7 @@ class ApplicationController < ActionController::Base
     # add score value
     # add notification_url value
     @json = notifications.map do |notification|
-      add_score_url_to_notification(notification, {})
+      add_score_url_to_notification(notification, {favRepos: @current_user.UserPreference.repos})
     end
 
     respond_to do |format|
@@ -62,7 +62,7 @@ class ApplicationController < ActionController::Base
     @current_user.UserPreference.search_input = user_input_string
     @current_user.UserPreference.repos = repoids.join(',')
     @current_user.UserPreference.save
-
+    binding.pry
     respond_to do |format|
       format.json {
         render json: repoids.to_json, status: 200
@@ -123,9 +123,16 @@ class ApplicationController < ActionController::Base
 
   #Add score attribute & value to each notification based on its "reason"
   #    notification_url attribute & value to each notification based on its "subject.type"
-  def add_score_url_to_notification(notification)
+  def add_score_url_to_notification(notification, options)
+    isFave = options[:favRepos].include?(notification.repository.id.to_s)
     nhash = notification.to_hash
-    nhash[:score] = score_from_reason(notification[:reason])
+
+    if isFave then
+      nhash[:score] = score_from_reason(notification[:reason]) + 100
+    else
+      nhash[:score] = score_from_reason(notification[:reason])
+    end
+
     nhash[:notification_url] = transform_api_url(notification[:subject][:type], notification[:subject][:url], notification[:subject][:title], notification[:repository][:html_url])
     nhash
   end

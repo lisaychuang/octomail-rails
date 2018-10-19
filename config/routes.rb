@@ -7,7 +7,8 @@ Rails.application.routes.draw do
   get '/auth/failure' => 'sessions#failure'
 
   get 'user-notifications' => 'application#notifications'
-  get 'search-repos' => 'application#searchRepo'
-  post 'find-repos' => 'application#findRepos'
+  get 'search-repos' => 'application#search_repos'
+  post 'find-repos' => 'application#find_repos'
+  get 'user-favorite-repos' => 'application#fav_repos'
 
 end

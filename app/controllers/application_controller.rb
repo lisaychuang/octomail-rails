@@ -168,26 +168,27 @@ class ApplicationController < ActionController::Base
   end
 
   # define score for each type of "reason"
+  # higher score = more important
   def score_from_reason(reason)
     case reason
     when "invitation"
-      1
+      9
     when "mention"
-      2
+      8
     when "assign"
-      3
+      7
     when "team_mention"
-      4
+      6
     when "manual"
       5
     when "author"
-      6
+      4
     when "state_change"
-      7
+      3
     when "comment"
-      8
+      2
     when "subscribed"
-      9
+      1
     else
       0
     end

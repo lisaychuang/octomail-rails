@@ -11,4 +11,6 @@ Rails.application.routes.draw do
   post 'find-repos' => 'application#find_repos'
   get 'user-favorite-repos' => 'application#fav_repos'
 
+  get 'user-info' => 'application#user_info'
+
 end

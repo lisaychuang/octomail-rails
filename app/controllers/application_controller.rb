@@ -9,6 +9,23 @@ class ApplicationController < ActionController::Base
   helper_method :user_signed_in?
   helper_method :correct_user?
 
+  # Get current user info
+  def user_info
+    @current_user ||= User.find(session[:user_id]) if session[:user_id]
+
+    respond_to do |format|
+      name = @current_user.name
+      username = @current_user.username
+      format.json {
+        render json: {
+          :name => name,
+          :username => username,
+        }.to_json, status: 200
+      }
+    end
+  end
+
+  # Get current user's notifications
   def notifications
     @current_user ||= User.find(session[:user_id]) if session[:user_id]
     @client = Octokit::Client.new(:access_token => @current_user.token)
@@ -44,7 +61,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # Return user's favorite repos in a string
+  # Get current user's favorite repos as a string
   def fav_repos
     @current_user ||= User.find(session[:user_id]) if session[:user_id]
     @json = @current_user.UserPreference[:search_input]
@@ -71,6 +88,7 @@ class ApplicationController < ActionController::Base
       "#{repo.to_hash[:id]}"
     end
 
+    # Save user search input and repos to UserPreference
     @current_user.UserPreference.search_input = user_input_string
     @current_user.UserPreference.repos = repoids.join(",")
     @current_user.UserPreference.save
